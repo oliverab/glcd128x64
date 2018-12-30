@@ -7,6 +7,7 @@
 
 
 #include <xc.h>
+#include <stdint.h>
 
 /* GLCD details for EasyPIC
  * 
@@ -36,7 +37,9 @@
  *  01XXXXXX=Set "Y" address (horizontal)
  *  10111XXX=Set "X" page (vertical)
  *  11XXXXXX=Set start line "Z"/Vertical scroll
-
+ * 
+ * Bit organisation LSB at top, MSB bottom
+ * 
  *  Status:
  *  7=Busy
  *  6=0
@@ -44,7 +47,9 @@
  *  4=Reset (1=Reset)
  *  3-0=0
  */
-
+/* 
+ * glcd conrol pins
+ */
 #define glcdcont LATB
 #define glcdcont_tris TRISB
 #define glcd_cs1 0b00000001
@@ -56,16 +61,55 @@
 #define glcd_ini (glcd_cs1|glcd_cs2)
 #define glcddata PORTD
 #define glcdtris TRISD
-
+/*
+ *  Control:
+ */
+#define glcdc_off 0b00111110
+#define glcdc_on 0b00111111
+#define glcdc_y  0b01000000
+ //*  10111XXX=Set "X" page (vertical)
+ //*  11XXXXXX=Set start line "Z"/Vertical scroll
 
 void main(void) {
-    TRISB=0x00;
+    /*
+    */
+    glcdcont_tris=0b11000000;
+    glcdcont=glcd_ini;
+    __delay_ms(100);
+    glcdcont|=glcd_rst;
+    glcdtris=0x00;
+    glcddata=glcdc_on;
+    glcdcont&=~glcd_cs1;
+    glcdcont|=glcd_e;
+    __delay_us(4);
+    glcdcont&=~glcd_e;
+    __delay_us(4);
+    glcdcont|=glcd_cs1;
+    glcdcont&=~glcd_cs2;
+    glcdcont|=glcd_e;
+    __delay_us(4);
+    glcdcont&=~glcd_e;
+    __delay_us(4);
+    glcdcont&=~glcd_cs1;
+    glcdcont|=glcd_cs2;
+    glcdcont|=glcd_rs;
+    for(int aa =0; aa<=0xff; aa++)
+    {
+        glcddata=aa;
+        glcdcont|=glcd_e;
+        __delay_us(4);
+        glcdcont&=~glcd_e;
+        __delay_us(4);
+    }
+    
+    TRISD=0x00;
     while (1)
     {
-        PORTB=0x55;
+        PORTD=0x55;
         __delay_ms(200);
-        PORTB=0xAA;
+        PORTD=0xAA;
         __delay_ms(200);
     }
+    
     return;
 }

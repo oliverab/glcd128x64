@@ -143,6 +143,7 @@ void glcd_clear(void)
 }
 void glcd_setpixel(uint8_t x,uint8_t y,uint8_t c)
 {
+    uint8_t d;
     if (x>0x7f || y>0x3f) return;
     if (x&0x40) {
         glcdset(glcd_cs1);
@@ -172,9 +173,10 @@ void glcd_setpixel(uint8_t x,uint8_t y,uint8_t c)
     __delay_us(8);
     glcdset(glcd_e);
     __delay_us(8);
-    uint8_t d=glcddata;
+    d=glcddata;
     glcdunset(glcd_e);
     __delay_us(8);
+    //write out
     glcdunset(glcd_rw);
     glcdunset(glcd_rs);
     glcdtris=0x00;
@@ -198,6 +200,7 @@ void glcd_setpixel(uint8_t x,uint8_t y,uint8_t c)
     glcdunset(glcd_rs);
 }
 void main(void) {
+    ANSELD=0;
     /*
      * Initialise glcd
      */
@@ -219,12 +222,15 @@ void main(void) {
     glcdunset(glcd_e);
     __delay_us(8);
     glcd_clear();
-    for(uint8_t x=10;x<100;x++)
+    for(uint8_t x=0;x<64;x++)
+        glcd_setpixel(x,x,1);
+    
+    for(uint8_t x=10;x<=100;x++)
     {
         glcd_setpixel(x,10,1);
         glcd_setpixel(x,50,1);
     }
-    for(uint8_t y=10;y<50;y++)
+    for(uint8_t y=11;y<50;y++)
     {
         glcd_setpixel(10,y,1);
         glcd_setpixel(100,y,1);
@@ -246,7 +252,7 @@ void main(void) {
     {
         PORTD=0x55;
         __delay_ms(200);
-        PORTD=0xAA;
+        PORTD=~PORTD;
         __delay_ms(200);
     }
     

@@ -86,7 +86,7 @@
 #define glcdc_off 0b00111110
 #define glcdc_on 0b00111111
 #define glcdc_y  0b01000000
- //*  10111XXX=Set "X" page (vertical)
+#define glcdc_x  0b10111000
  //*  11XXXXXX=Set start line "Z"/Vertical scroll
 
 void glcd_clear(void)
@@ -140,6 +140,62 @@ void glcd_clear(void)
         glcdunset(glcd_rs);
         
     }
+}
+void glcd_setpixel(uint8_t x,uint8_t y,uint8_t c)
+{
+    if (x>0x7f || y>0x3f) return;
+    if (x&0x40) {
+        glcdset(glcd_cs1);
+        glcdunset(glcd_cs2);
+    } else {
+        glcdunset(glcd_cs1);
+        glcdset(glcd_cs2);
+    }
+    glcdunset(glcd_rs);
+    glcddata=glcdc_x|((y>>3)&7);
+    glcdset(glcd_e);
+    __delay_us(8);
+    glcdunset(glcd_e);
+    __delay_us(8);
+    glcddata=glcdc_y|(x&0x3f);
+    glcdset(glcd_e);
+    __delay_us(8);
+    glcdunset(glcd_e);
+    __delay_us(8);
+    //read in
+    glcdtris=0xff;
+    glcdset(glcd_rw);
+    glcdset(glcd_rs);
+    glcdset(glcd_e);
+    __delay_us(8);
+    glcdunset(glcd_e);
+    __delay_us(8);
+    glcdset(glcd_e);
+    __delay_us(8);
+    uint8_t d=glcddata;
+    glcdunset(glcd_e);
+    __delay_us(8);
+    glcdunset(glcd_rw);
+    glcdunset(glcd_rs);
+    glcdtris=0x00;
+    glcddata=glcdc_y|(x&0x3f);
+    glcdset(glcd_e);
+    __delay_us(8);
+    glcdunset(glcd_e);
+    __delay_us(8);
+    if (c)
+    {
+        d|=1<<(y&7);
+    } else {
+        d&=~(1<<(y&7));
+    }
+    glcdset(glcd_rs);
+    glcddata=d;    
+    glcdset(glcd_e);
+    __delay_us(8);
+    glcdunset(glcd_e);
+    __delay_us(8);
+    glcdunset(glcd_rs);
 }
 void main(void) {
     /*

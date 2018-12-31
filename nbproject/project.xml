@@ -3,7 +3,7 @@
     <type>com.microchip.mplab.nbide.embedded.makeproject</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/make-project/1">
-            <name>led_blink</name>
+            <name>glcd128x64</name>
             <creation-uuid>bc885324-fa0b-4870-9133-5f5d964e1a67</creation-uuid>
             <make-project-type>0</make-project-type>
             <c-extensions>c</c-extensions>

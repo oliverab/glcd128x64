@@ -87,6 +87,58 @@
  //*  10111XXX=Set "X" page (vertical)
  //*  11XXXXXX=Set start line "Z"/Vertical scroll
 
+void glcd_clear(void)
+{
+    glcdcont&=~glcd_rs;
+    glcddata=glcdc_y;
+    glcdcont&=~glcd_cs1;
+    glcdcont|=glcd_cs2;
+    glcdcont|=glcd_e;
+    __delay_us(8);
+    glcdcont&=~glcd_e;
+    __delay_us(8);
+    glcdcont|=glcd_cs1;
+    glcdcont&=~glcd_cs2;
+    glcdcont|=glcd_e;
+    __delay_us(8);
+    glcdcont&=~glcd_e;
+    __delay_us(8);
+    for (uint8_t xx=0b10111000; xx<=0b10111111;xx++)
+    {
+        glcddata=xx;
+        glcdcont&=~glcd_cs1;
+        glcdcont|=glcd_cs2;
+        glcdcont|=glcd_e;
+        __delay_us(8);
+        glcdcont&=~glcd_e;
+        __delay_us(8);
+        glcdcont|=glcd_cs1;
+        glcdcont&=~glcd_cs2;
+        glcdcont|=glcd_e;
+        __delay_us(8);
+        glcdcont&=~glcd_e;
+        __delay_us(8);
+        glcddata=0;
+        glcdcont|=glcd_rs;
+        for(uint8_t aa =0; aa<=0x3f; aa++)
+        {
+            glcdcont&=~glcd_cs1;
+            glcdcont|=glcd_cs2;
+            glcdcont|=glcd_e;
+            __delay_us(8);
+            glcdcont&=~glcd_e;
+            __delay_us(8);
+            glcdcont|=glcd_cs1;
+            glcdcont&=~glcd_cs2;
+            glcdcont|=glcd_e;
+            __delay_us(8);
+            glcdcont&=~glcd_e;
+            __delay_us(8);
+        }
+        glcdcont&=~glcd_rs;
+        
+    }
+}
 void main(void) {
     /*
      * Initialise glcd
@@ -108,10 +160,11 @@ void main(void) {
     __delay_us(8);
     glcdcont&=~glcd_e;
     __delay_us(8);
+    glcd_clear();
     glcdcont&=~glcd_cs1;
     glcdcont|=glcd_cs2;
     glcdcont|=glcd_rs;
-    for(int aa =0; aa<=0xff; aa++)
+    for(uint8_t aa =0; aa<=0x3f; aa++)
     {
         glcddata=aa;
         glcdcont|=glcd_e;

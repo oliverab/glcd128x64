@@ -46,9 +46,26 @@
  *  5=on/off (1=off)
  *  4=Reset (1=Reset)
  *  3-0=0
+ * 
+ * TIMING
+ * 
+ * From controller datasheet at 1/64 duty a 70Hz frame rate requires a 250kHz
+ * clock or a cycle time of <4us
+ * 
+ * Elsewhere the busy time is given as between 1/Fclk and 3/Fclk, making the
+ * maximum busy time 12us, using a E high and low duration of 8us guarantees 
+ * this
+ * 
+ * Since it takes only 1us to execute a read or write there is some gain from 
+ * busy polling
+ * 
+ * On displays tested so far it appears that a status read is not latched 
+ * meaning that it is possible to set RS=0,R/W=1,E=1 and wait for D7 to go low 
+ * though this is so far undocumented and some controllers might require 
+ * cycling of E
  */
 /* 
- * glcd conrol pins
+ * glcd control pins
  */
 #define glcdcont LATB
 #define glcdcont_tris TRISB
@@ -72,7 +89,8 @@
 
 void main(void) {
     /*
-    */
+     * Initialise glcd
+     */
     glcdcont_tris=0b11000000;
     glcdcont=glcd_ini;
     __delay_ms(100);
@@ -81,15 +99,15 @@ void main(void) {
     glcddata=glcdc_on;
     glcdcont&=~glcd_cs1;
     glcdcont|=glcd_e;
-    __delay_us(4);
+    __delay_us(8);
     glcdcont&=~glcd_e;
-    __delay_us(4);
+    __delay_us(8);
     glcdcont|=glcd_cs1;
     glcdcont&=~glcd_cs2;
     glcdcont|=glcd_e;
-    __delay_us(4);
+    __delay_us(8);
     glcdcont&=~glcd_e;
-    __delay_us(4);
+    __delay_us(8);
     glcdcont&=~glcd_cs1;
     glcdcont|=glcd_cs2;
     glcdcont|=glcd_rs;
@@ -97,9 +115,9 @@ void main(void) {
     {
         glcddata=aa;
         glcdcont|=glcd_e;
-        __delay_us(4);
+        __delay_us(8);
         glcdcont&=~glcd_e;
-        __delay_us(4);
+        __delay_us(8);
     }
     
     TRISD=0x00;

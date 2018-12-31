@@ -219,7 +219,17 @@ void main(void) {
     glcdunset(glcd_e);
     __delay_us(8);
     glcd_clear();
-    glcdunset(glcd_cs1);
+    for(uint8_t x=10;x<100;x++)
+    {
+        glcd_setpixel(x,10,1);
+        glcd_setpixel(x,50,1);
+    }
+    for(uint8_t y=10;y<50;y++)
+    {
+        glcd_setpixel(10,y,1);
+        glcd_setpixel(100,y,1);
+    }
+/*    glcdunset(glcd_cs1);
     glcdset(glcd_cs2);
     glcdset(glcd_rs);
     for(uint8_t aa =0; aa<=0x3f; aa++)
@@ -230,7 +240,7 @@ void main(void) {
         glcdunset(glcd_e);
         __delay_us(8);
     }
-    
+  */  
     TRISD=0x00;
     while (1)
     {

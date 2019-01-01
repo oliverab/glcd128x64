@@ -199,6 +199,82 @@ void glcd_setpixel(uint8_t x,uint8_t y,uint8_t c)
     __delay_us(8);
     glcdunset(glcd_rs);
 }
+void glcd_vline(uint8_t x,uint8_t y1,uint8_t y2,uint8_t c)
+{
+    uint8_t y;
+    if (y1>y2) {uint8_t t=y2;y2=y1;y1=t;}
+    if (x>0x7f || y1>0x3f) return;
+    if (x&0x40) {
+        glcdset(glcd_cs1);
+        glcdunset(glcd_cs2);
+    } else {
+        glcdunset(glcd_cs1);
+        glcdset(glcd_cs2);
+    }
+    glcdunset(glcd_rs);
+    for(y=(y1 & 0xf8); y <= (y2&0xf8);y+=8)
+    {
+        uint8_t m=0;
+        uint8_t d;
+        if (y==(y1&0xf8)) // match line start
+        {
+            m|=((1<<(y1&7))-1);
+        }
+        if (y==(y2&0xf8)) // match line end
+        {
+            m|=(0xfe<<(y2&7));
+        }
+        glcddata = glcdc_x | ((y >> 3)&7);
+        glcdset(glcd_e);
+        __delay_us(8);
+        glcdunset(glcd_e);
+        __delay_us(8);
+        if (m) 
+        {
+            glcddata = glcdc_y | (x & 0x3f);
+            glcdset(glcd_e);
+            __delay_us(8);
+            glcdunset(glcd_e);
+            __delay_us(8);
+            //read in
+            glcdtris = 0xff;
+            glcdset(glcd_rw);
+            glcdset(glcd_rs);
+            glcdset(glcd_e);
+            __delay_us(8);
+            glcdunset(glcd_e);
+            __delay_us(8);
+            glcdset(glcd_e);
+            __delay_us(8);
+            d = glcddata;
+            glcdunset(glcd_e);
+            __delay_us(8);
+            //write out
+            glcdunset(glcd_rw);
+            glcdunset(glcd_rs);
+            glcdtris = 0x00;
+            
+        }
+        glcddata = glcdc_y | (x & 0x3f);
+        glcdset(glcd_e);
+        __delay_us(8);
+        glcdunset(glcd_e);
+        __delay_us(8);
+        if (c) 
+        {
+            d |= ~m;
+        } else {
+            d &= m;
+        }
+        glcdset(glcd_rs);
+        glcddata = d;
+        glcdset(glcd_e);
+        __delay_us(8);
+        glcdunset(glcd_e);
+        __delay_us(8);
+        glcdunset(glcd_rs);
+    }
+}
 void main(void) {
     ANSELD=0;
     /*
@@ -223,7 +299,9 @@ void main(void) {
     __delay_us(8);
     glcd_clear();
     for(uint8_t x=0;x<64;x++)
-        glcd_setpixel(x,x,1);
+        glcd_vline(x+32,x,63-x,1);
+    for(uint8_t x=4;x<28;x++)
+        glcd_vline(x+32,x+2,61-x,0);
     
     for(uint8_t x=10;x<=100;x++)
     {

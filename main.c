@@ -292,6 +292,13 @@ void glcd_line(int x1,int y1, int x2,int y2,uint8_t c)
         {
             d-=dx;
             if (y2>y1) y++; else y--;
+            while (d>=dx)
+            {
+                glcd_setpixel(x,y,c);
+                d-=dx;
+                if (y2>y1) y++; else y--;
+                
+            }
         }
         if (x2>x1) x++; else x--;
     }
@@ -349,6 +356,7 @@ void main(void) {
   */  
     __delay_ms(200);
     glcd_line(10,10,117,53,1);
+    glcd_line(73,10,54,53,1);
     TRISD=0x00;
     while (1)
     {

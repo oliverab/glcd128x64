@@ -275,34 +275,52 @@ void glcd_vline(uint8_t x,uint8_t y1,uint8_t y2,uint8_t c)
         glcdunset(glcd_rs);
     }
 }
-void glcd_line(int x1,int y1, int x2,int y2,uint8_t c)
+void glcd_line(uint8_t x1,uint8_t y1, uint8_t x2,uint8_t y2,uint8_t c)
+/*
+ * Modified Bresenham line draw, extended to draw steep lines as a series of
+ * vertical lines not dots due to display memory organisation
+ *
+ */
 {
-    int dx=x2-x1;
+    int8_t dx=x2-x1;
     if (dx<0) dx=-dx;
-    int dy=y2-y1;
+    dx++;
+    int8_t dy=y2-y1;
     if (dy<0) dy=-dy;
-    int d=dx/2;
-    int x=x1;
-    int y=y1;
-    while (x!=x2)
+    dy++;
+    uint8_t d=dx/2;
+    int d2;
+    while (x1!=x2)
     {
-        glcd_setpixel(x,y,c);
         d+=dy;
         if (d>=dx) 
         {
-            d-=dx;
-            if (y2>y1) y++; else y--;
+            d2=d / dx;
+            if (y2>y1)
+            {
+                glcd_vline(x1,y1,y1+d2-1,c);
+                y1+=d2;
+            } else {
+                glcd_vline(x1,y1,y1-d2+1,c);
+                y1-=d2;
+            }
+            d%=dx;
+/*              
             while (d>=dx)
             {
-                glcd_setpixel(x,y,c);
+                glcd_setpixel(x1,y1,c);
                 d-=dx;
-                if (y2>y1) y++; else y--;
-                
+                if (y2>y1) y1++; else y1--;
             }
+*/            
         }
-        if (x2>x1) x++; else x--;
+        else
+        {
+            glcd_setpixel(x1,y1,c);
+        }
+        if (x2>x1) x1++; else x1--;
     }
-    glcd_setpixel(x,y,c);
+    glcd_vline(x1,y1,y2,c);
 }
 void main(void) {
     ANSELD=0;
@@ -355,8 +373,22 @@ void main(void) {
     }
   */  
     __delay_ms(200);
-    glcd_line(10,10,117,53,1);
-    glcd_line(73,10,54,53,1);
+    __delay_ms(200);
+    __delay_ms(200);
+    __delay_ms(200);
+    __delay_ms(200);
+    __delay_ms(200);
+    __delay_ms(200);
+    __delay_ms(200);
+    __delay_ms(200);
+    __delay_ms(200);
+    __delay_ms(200);
+    glcd_clear();
+    for(uint8_t aa=10;aa<=100;aa+=10)
+    {
+        glcd_line(aa,10,10,53,1);
+    }
+    //glcd_line(73,10,54,53,1);
     TRISD=0x00;
     while (1)
     {

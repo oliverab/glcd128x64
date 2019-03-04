@@ -322,6 +322,26 @@ void glcd_line(uint8_t x1,uint8_t y1, uint8_t x2,uint8_t y2,uint8_t c)
     }
     glcd_vline(x1,y1,y2,c);
 }
+void glcd_fill_circle(uint8_t x,uint8_t y,uint8_t r,uint8_t c)
+{
+    int8_t d;
+    uint8_t x1;
+    uint8_t y1;
+    d=0;
+    x1=0;
+    y1=r;
+    while (x1<=r){
+        glcd_vline(x+x1,y-y1,y+y1,c);
+        if (x1) glcd_vline(x-x1,y-y1,y+y1,c);
+        d+=2*x1+1;
+        x1++;
+        while (d>0 && y1>0)
+        {
+            y1--;
+            d-=2*y1+1;
+        }
+    }
+}
 void main(void) {
     ANSELD=0;
     /*
@@ -389,6 +409,19 @@ void main(void) {
         glcd_line(aa,10,10,53,1);
     }
     //glcd_line(73,10,54,53,1);
+    __delay_ms(200);
+    __delay_ms(200);
+    __delay_ms(200);
+    __delay_ms(200);
+    __delay_ms(200);
+    __delay_ms(200);
+    __delay_ms(200);
+    __delay_ms(200);
+    __delay_ms(200);
+    __delay_ms(200);
+    __delay_ms(200);
+    glcd_clear();
+    glcd_fill_circle(64,32,30,1);
     TRISD=0x00;
     while (1)
     {

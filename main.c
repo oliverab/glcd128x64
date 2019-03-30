@@ -345,9 +345,11 @@ void glcd_fill_circle(uint8_t x,uint8_t y,uint8_t r,uint8_t c)
 void main(void) {
     ANSELD=0;
     //OSCCON NEEDED FOR PIC18F45K22
+#ifdef OSCCON
     OSCCON=0X72;
+#endif
     /*
-     * Initialise glcd
+     * Initialize glcd
      */
     glcdcont_tris=0b11000000;
     glcdcont=glcd_ini;

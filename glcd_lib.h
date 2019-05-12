@@ -67,8 +67,14 @@
 extern "C" {
 #endif /* __cplusplus */
 
-    // TODO If C++ is being used, regular C code needs function names to have C 
-    // linkage so the functions can be used by the c code. 
+void glcd_reset(void);
+void glcd_on(void);
+void glcd_clear(void);
+void glcd_setpixel(uint8_t x,uint8_t y,uint8_t c);
+void glcd_vline(uint8_t x,uint8_t y1,uint8_t y2,uint8_t c);
+void glcd_line(uint8_t x1,uint8_t y1, uint8_t x2,uint8_t y2,uint8_t c);
+void glcd_fill_circle(uint8_t x,uint8_t y,uint8_t r,uint8_t c);
+
 
 #ifdef	__cplusplus
 }

@@ -64,25 +64,7 @@
  * though this is so far undocumented and some controllers might require 
  * cycling of E
  */
-/* 
- * glcd control pins
- */
-#define glcdcont_lat LATB
-#define glcdcont_tris TRISB
-#define glcddata_port PORTD
-#define glcddata_tris TRISD
-/*
- * Macros to access display pins: can be replaced with function calls to
- * allow use of an I/O expander
- */
-#define glcdcont_write(X) glcdcont_lat=(X)
-#define glcdcont_set(X) glcdcont_lat|=(X)
-#define glcdcont_unset(X) glcdcont_lat&=~(X)
-#define glcddata_write(X) glcddata_port=(X)
-#define glcddata_wr_tris(X) glcddata_tris=(X)
-#define glcddata_read() glcddata_port
-
-
+#include "glcd_hardware.h"
 #define glcd_cs1 0b00000001
 #define glcd_cs2 0b00000010
 #define glcd_rs  0b00000100
@@ -163,12 +145,12 @@ void glcd_setpixel(uint8_t x,uint8_t y,uint8_t c)
         glcdcont_set(glcd_cs2);
     }
     glcdcont_unset(glcd_rs);
-    glcddata_write(glcdc_x|((y>>3)&7));
+    glcddata_write((uint8_t)(glcdc_x|((y>>3)&7)));
     glcdcont_set(glcd_e);
     __delay_us(8);
     glcdcont_unset(glcd_e);
     __delay_us(8);
-    glcddata_write(glcdc_y|(x&0x3f));
+    glcddata_write((uint8_t)(glcdc_y|(x&0x3f)));
     glcdcont_set(glcd_e);
     __delay_us(8);
     glcdcont_unset(glcd_e);
@@ -190,7 +172,7 @@ void glcd_setpixel(uint8_t x,uint8_t y,uint8_t c)
     glcdcont_unset(glcd_rw);
     glcdcont_unset(glcd_rs);
     glcddata_wr_tris(0x00);
-    glcddata_write(glcdc_y|(x&0x3f));
+    glcddata_write((uint8_t)(glcdc_y|(x&0x3f)));
     glcdcont_set(glcd_e);
     __delay_us(8);
     glcdcont_unset(glcd_e);

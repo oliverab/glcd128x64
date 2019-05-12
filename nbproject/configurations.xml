@@ -5,6 +5,7 @@
                    displayName="Header Files"
                    projectFiles="true">
       <itemPath>glcd_hardware.h</itemPath>
+      <itemPath>glcd_lib.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -16,6 +17,7 @@
       <itemPath>main.c</itemPath>
       <itemPath>configk42.c</itemPath>
       <itemPath>configk22.c</itemPath>
+      <itemPath>glcd_lib.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"

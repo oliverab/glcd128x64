@@ -9,6 +9,8 @@
 #include <xc.h>
 #include <stdint.h>
 
+#include "glcd_lib.h"
+
 /* GLCD details for EasyPIC
  * 
  *  1	CS1	RB0	Active low
@@ -81,6 +83,30 @@
 #define glcdc_x  0b10111000
  //*  11XXXXXX=Set start line "Z"/Vertical scroll
 
+void glcd_reset(void)
+{
+    glcdcont_wr_tris(0b11000000);
+    glcdcont_write(glcd_ini);
+}
+void glcd_on(void)
+{
+        glcdcont_set(glcd_rst);
+    glcddata_wr_tris(0x00);
+    glcddata_write(glcdc_on);
+    glcdcont_unset(glcd_cs1);
+    glcdcont_set(glcd_e);
+    glcd_wait();
+    glcdcont_unset(glcd_e);
+    glcd_wait();
+    glcdcont_set(glcd_cs1);
+    glcdcont_unset(glcd_cs2);
+    glcdcont_set(glcd_e);
+    glcd_wait();
+    glcdcont_unset(glcd_e);
+    glcd_wait();
+
+}
+
 void glcd_clear(void)
 {
     glcdcont_unset(glcd_rs);
@@ -88,30 +114,30 @@ void glcd_clear(void)
     glcdcont_unset(glcd_cs1);
     glcdcont_set(glcd_cs2);
     glcdcont_set(glcd_e);
-    __delay_us(8);
+    glcd_wait();
     glcdcont_unset(glcd_e);
-    __delay_us(8);
+    glcd_wait();
     glcdcont_set(glcd_cs1);
     glcdcont_unset(glcd_cs2);
     glcdcont_set(glcd_e);
-    __delay_us(8);
+    glcd_wait();
     glcdcont_unset(glcd_e);
-    __delay_us(8);
+    glcd_wait();
     for (uint8_t xx=0b10111000; xx<=0b10111111;xx++)
     {
         glcddata_write(xx);
         glcdcont_unset(glcd_cs1);
         glcdcont_set(glcd_cs2);
         glcdcont_set(glcd_e);
-        __delay_us(8);
+        glcd_wait();
         glcdcont_unset(glcd_e);
-        __delay_us(8);
+        glcd_wait();
         glcdcont_set(glcd_cs1);
         glcdcont_unset(glcd_cs2);
         glcdcont_set(glcd_e);
-        __delay_us(8);
+        glcd_wait();
         glcdcont_unset(glcd_e);
-        __delay_us(8);
+        glcd_wait();
         glcddata_write(0);
         glcdcont_set(glcd_rs);
         for(uint8_t aa =0; aa<=0x3f; aa++)
@@ -119,15 +145,15 @@ void glcd_clear(void)
             glcdcont_unset(glcd_cs1);
             glcdcont_set(glcd_cs2);
             glcdcont_set(glcd_e);
-            __delay_us(8);
+            glcd_wait();
             glcdcont_unset(glcd_e);
-            __delay_us(8);
+            glcd_wait();
             glcdcont_set(glcd_cs1);
             glcdcont_unset(glcd_cs2);
             glcdcont_set(glcd_e);
-            __delay_us(8);
+            glcd_wait();
             glcdcont_unset(glcd_e);
-            __delay_us(8);
+            glcd_wait();
         }
         glcdcont_unset(glcd_rs);
         
@@ -147,36 +173,36 @@ void glcd_setpixel(uint8_t x,uint8_t y,uint8_t c)
     glcdcont_unset(glcd_rs);
     glcddata_write((uint8_t)(glcdc_x|((y>>3)&7)));
     glcdcont_set(glcd_e);
-    __delay_us(8);
+    glcd_wait();
     glcdcont_unset(glcd_e);
-    __delay_us(8);
+    glcd_wait();
     glcddata_write((uint8_t)(glcdc_y|(x&0x3f)));
     glcdcont_set(glcd_e);
-    __delay_us(8);
+    glcd_wait();
     glcdcont_unset(glcd_e);
-    __delay_us(8);
+    glcd_wait();
     //read in
     glcddata_wr_tris(0xff);
     glcdcont_set(glcd_rw);
     glcdcont_set(glcd_rs);
     glcdcont_set(glcd_e);
-    __delay_us(8);
+    glcd_wait();
     glcdcont_unset(glcd_e);
-    __delay_us(8);
+    glcd_wait();
     glcdcont_set(glcd_e);
-    __delay_us(8);
+    glcd_wait();
     d=glcddata_read();
     glcdcont_unset(glcd_e);
-    __delay_us(8);
+    glcd_wait();
     //write out
     glcdcont_unset(glcd_rw);
     glcdcont_unset(glcd_rs);
     glcddata_wr_tris(0x00);
     glcddata_write((uint8_t)(glcdc_y|(x&0x3f)));
     glcdcont_set(glcd_e);
-    __delay_us(8);
+    glcd_wait();
     glcdcont_unset(glcd_e);
-    __delay_us(8);
+    glcd_wait();
     if (c)
     {
         d|=1<<(y&7);
@@ -186,9 +212,9 @@ void glcd_setpixel(uint8_t x,uint8_t y,uint8_t c)
     glcdcont_set(glcd_rs);
     glcddata_write(d);    
     glcdcont_set(glcd_e);
-    __delay_us(8);
+    glcd_wait();
     glcdcont_unset(glcd_e);
-    __delay_us(8);
+    glcd_wait();
     glcdcont_unset(glcd_rs);
 }
 void glcd_vline(uint8_t x,uint8_t y1,uint8_t y2,uint8_t c)
@@ -218,29 +244,29 @@ void glcd_vline(uint8_t x,uint8_t y1,uint8_t y2,uint8_t c)
         }
         glcddata_write(glcdc_x | ((y >> 3)&7));
         glcdcont_set(glcd_e);
-        __delay_us(8);
+        glcd_wait();
         glcdcont_unset(glcd_e);
-        __delay_us(8);
+        glcd_wait();
         if (m) 
         {
             glcddata_write(glcdc_y | (x & 0x3f));
             glcdcont_set(glcd_e);
-            __delay_us(8);
+            glcd_wait();
             glcdcont_unset(glcd_e);
-            __delay_us(8);
+            glcd_wait();
             //read in
             glcddata_wr_tris(0xff);
             glcdcont_set(glcd_rw);
             glcdcont_set(glcd_rs);
             glcdcont_set(glcd_e);
-            __delay_us(8);
+            glcd_wait();
             glcdcont_unset(glcd_e);
-            __delay_us(8);
+            glcd_wait();
             glcdcont_set(glcd_e);
-            __delay_us(8);
+            glcd_wait();
             d = glcddata_read();
             glcdcont_unset(glcd_e);
-            __delay_us(8);
+            glcd_wait();
             //write out
             glcdcont_unset(glcd_rw);
             glcdcont_unset(glcd_rs);
@@ -249,9 +275,9 @@ void glcd_vline(uint8_t x,uint8_t y1,uint8_t y2,uint8_t c)
         }
         glcddata_write(glcdc_y | (x & 0x3f));
         glcdcont_set(glcd_e);
-        __delay_us(8);
+        glcd_wait();
         glcdcont_unset(glcd_e);
-        __delay_us(8);
+        glcd_wait();
         if (c) 
         {
             d |= ~m;
@@ -261,9 +287,9 @@ void glcd_vline(uint8_t x,uint8_t y1,uint8_t y2,uint8_t c)
         glcdcont_set(glcd_rs);
         glcddata_write(d);
         glcdcont_set(glcd_e);
-        __delay_us(8);
+        glcd_wait();
         glcdcont_unset(glcd_e);
-        __delay_us(8);
+        glcd_wait();
         glcdcont_unset(glcd_rs);
     }
 }
@@ -343,23 +369,9 @@ void main(void) {
     /*
      * Initialize glcd
      */
-    glcdcont_tris=0b11000000;
-    glcdcont_write(glcd_ini);
+    glcd_reset();
     __delay_ms(100);
-    glcdcont_set(glcd_rst);
-    glcddata_wr_tris(0x00);
-    glcddata_write(glcdc_on);
-    glcdcont_unset(glcd_cs1);
-    glcdcont_set(glcd_e);
-    __delay_us(8);
-    glcdcont_unset(glcd_e);
-    __delay_us(8);
-    glcdcont_set(glcd_cs1);
-    glcdcont_unset(glcd_cs2);
-    glcdcont_set(glcd_e);
-    __delay_us(8);
-    glcdcont_unset(glcd_e);
-    __delay_us(8);
+    glcd_on();
     glcd_clear();
     for(uint8_t x=0;x<64;x++)
         glcd_vline(x+32,x,63-x,1);
@@ -383,9 +395,9 @@ void main(void) {
     {
         glcddata=aa;
         glcdset(glcd_e);
-        __delay_us(8);
+        glcd_wait();
         glcdunset(glcd_e);
-        __delay_us(8);
+        glcd_wait();
     }
   */  
     __delay_ms(200);

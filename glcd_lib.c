@@ -46,7 +46,7 @@
  * though this is so far undocumented and some controllers might require 
  * cycling of E
  */
-#include "glcd_hardware.h"
+#include "../glcd_hardware.h"
 #define glcd_cs1 0b00000001
 #define glcd_cs2 0b00000010
 #define glcd_rs  0b00000100

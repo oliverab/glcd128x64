@@ -10,6 +10,7 @@
 #include <stdint.h>
 
 #include "glcd_lib.h"
+#include "systfont.h"
 
 
 /*  Glcd control signals and commands

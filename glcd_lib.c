@@ -341,3 +341,7 @@ void glcd_fill_circle(uint8_t x,uint8_t y,uint8_t r,uint8_t c)
         }
     }
 }
+void glcd_systext(uint8_t x,uint8_t y,char *tx,uint8_t c)
+{
+    
+}

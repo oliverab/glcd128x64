@@ -62,6 +62,7 @@
 #define glcdc_on 0b00111111
 #define glcdc_y  0b01000000
 #define glcdc_x  0b10111000
+#define glcd_setstart 0b11000000
  //*  11XXXXXX=Set start line "Z"/Vertical scroll
 
 void glcd_reset(void)
@@ -71,7 +72,8 @@ void glcd_reset(void)
 }
 void glcd_on(void)
 {
-        glcdcont_set(glcd_rst);
+    glcdcont_set(glcd_rst);
+    glcdcont_unset(glcd_rs);
     glcddata_wr_tris(0x00);
     glcddata_write(glcdc_on);
     glcdcont_unset(glcd_cs1);
@@ -341,7 +343,7 @@ void glcd_fill_circle(uint8_t x,uint8_t y,uint8_t r,uint8_t c)
         }
     }
 }
-void glcd_systext(uint8_t x,uint8_t y,char *tx,uint8_t c)
+void glcd_systext(uint8_t x,uint8_t y,const char *tx,uint8_t c)
 {
     //uint8_t d;
     if (x>0x7f || y>0x3f) return;
@@ -400,5 +402,25 @@ void glcd_systext(uint8_t x,uint8_t y,char *tx,uint8_t c)
         tx++;
     }
     glcdcont_unset(glcd_rs);
+
+}
+
+void glcd_set_start_line(uint8_t l)
+{
+    glcdcont_unset(glcd_rs);
+    glcddata_wr_tris(0x00);
+    glcddata_write(glcd_setstart | l);
+    glcdcont_unset(glcd_cs1);
+    glcdcont_set(glcd_cs2);
+    glcdcont_set(glcd_e);
+    glcd_wait();
+    glcdcont_unset(glcd_e);
+    glcd_wait();
+    glcdcont_set(glcd_cs1);
+    glcdcont_unset(glcd_cs2);
+    glcdcont_set(glcd_e);
+    glcd_wait();
+    glcdcont_unset(glcd_e);
+    glcd_wait();
 
 }

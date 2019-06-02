@@ -16,6 +16,10 @@
 #define	GLCD_HARDWARE_H
 
 #include <xc.h>
+/*
+ * Uncomment if using MCC to insert MCC.h _XTAL_FREQ definition
+ */
+//#include "mcc_generated_files/mcc.h"
 /* 
  * glcd control pins
  */

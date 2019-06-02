@@ -18,7 +18,9 @@
  *  Control:
  *  0011111X=Display 0=off,1=on
  *  01XXXXXX=Set "Y" address (horizontal)
+ *  In controller data the horizontal position is labelled Y
  *  10111XXX=Set "X" page (vertical)
+ *  In controller data the vertical position is labelled X
  *  11XXXXXX=Set start line "Z"/Vertical scroll
  * 
  * Bit organisation LSB at top, MSB bottom
@@ -340,6 +342,48 @@ void glcd_fill_circle(uint8_t x,uint8_t y,uint8_t r,uint8_t c)
         {
             y1--;
             d-=2*y1+1;
+        }
+    }
+}
+void glcd_fill_donut(uint8_t x,uint8_t y,uint8_t r1,uint8_t r2,uint8_t c)
+{
+    int8_t d1;
+    int8_t d2;
+    uint8_t xx;
+    uint8_t y1;
+    uint8_t y2;
+    d1=0;
+    d2=0;
+    xx=0;
+    y1=r1;
+    y2=r2+1; //fudge y2 so the circle-in-circle is 1 bigger
+    while (xx<=r1){
+        if (y2)
+        {
+            glcd_vline(x+xx,y-y1,y-y2,c);
+            glcd_vline(x+xx,y+y2,y+y1,c);
+            if (xx) {
+                glcd_vline(x-xx,y-y1,y-y2,c);
+                glcd_vline(x-xx,y+y2,y+y1,c);
+            }
+        }
+        else
+        {
+            glcd_vline(x+xx,y-y1,y+y1,c);
+            if (xx) glcd_vline(x-xx,y-y1,y+y1,c);
+        }
+        d1+=2*xx+1;
+        d2+=2*xx+1;
+        xx++;
+        while (d1>0 && y1>0)
+        {
+            y1--;
+            d1-=2*y1+1;
+        }
+        while (d2>0 && y2>0)
+        {
+            y2--;
+            d2-=2*y2-1;//correction for y2=r2+1
         }
     }
 }

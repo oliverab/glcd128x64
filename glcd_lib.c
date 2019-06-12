@@ -325,6 +325,90 @@ void glcd_line(uint8_t x1,uint8_t y1, uint8_t x2,uint8_t y2,uint8_t c)
     }
     glcd_vline(x1,y1,y2,c);
 }
+/*
+ * Classic unfilled circle draw
+ */
+/*
+void glcd_circle(uint8_t x,uint8_t y,uint8_t r,uint8_t c)
+{
+    int8_t d;
+    uint8_t x1;
+    uint8_t y1;
+    d=0;
+    x1=0;
+    y1=r;
+    while (x1<=y1){
+        glcd_setpixel(x+x1,y-y1,c);
+        glcd_setpixel(x+x1,y+y1,c);
+        glcd_setpixel(x-y1,y+x1,c);
+        glcd_setpixel(x+y1,y+x1,c);
+        if (x1) {
+            glcd_setpixel(x-x1,y-y1,c);
+            glcd_setpixel(x-x1,y+y1,c);
+            glcd_setpixel(x-y1,y-x1,c);
+            glcd_setpixel(x+y1,y-x1,c);
+        }
+        d+=2*x1+1;
+        x1++;
+        while (d>0 && y1>0)
+        {
+            y1--;
+            d-=2*y1+1;
+        }
+    }
+}
+ */ 
+/*
+ * Optimise circle draw to use vlines not dots where possible
+ * This is seriously "trying too hard", but could improve speed wherever
+ * multiple dots land in the same byte
+ * 
+ * for an explanation the code calculates the y value one-ahead and
+ * uses this to determine how much of a join is needed
+ */
+
+void glcd_circle(uint8_t x,uint8_t y,uint8_t r,uint8_t c)
+{
+    int8_t d;
+    uint8_t x1;
+    uint8_t y1;
+    uint8_t y2;
+    d=0;
+    x1=0;
+    y2=r+1;
+    while (x1<r){
+        y1=y2-1;
+        d+=2*x1+1;
+        while (d>0 && y1>0)
+        {
+            y2--;
+            d-=2*y2-1;
+        }
+        if (y1>y2)
+        {
+            glcd_vline(x+x1,y-y1,y-y2,c);
+            glcd_vline(x+x1,y+y2,y+y1,c);
+            if (x1) {
+                glcd_vline(x - x1, y - y1, y - y2, c);
+                glcd_vline(x - x1, y + y2, y + y1, c);
+            }
+        } else {
+            glcd_setpixel(x + x1, y - y1, c);
+            glcd_setpixel(x + x1, y + y1, c);
+            if (x1) {
+                glcd_setpixel(x - x1, y - y1, c);
+                glcd_setpixel(x - x1, y + y1, c);
+            }
+        }
+        x1++;
+        
+    }
+    y1=y2-1;
+    glcd_vline(x+x1,y-y1,y+y1,c);
+    if (x1) {
+        glcd_vline(x - x1, y - y1, y + y1, c);
+    }
+}
 void glcd_fill_circle(uint8_t x,uint8_t y,uint8_t r,uint8_t c)
 {
     int8_t d;

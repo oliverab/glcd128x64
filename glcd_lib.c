@@ -532,6 +532,265 @@ void glcd_systext(uint8_t x,uint8_t y,const char *tx,uint8_t c)
     glcdcont_unset(glcd_rs);
 
 }
+void glcd_adv_systext(uint8_t x,uint8_t y,const char *tx,uint8_t c)
+{
+    uint8_t buf[5];
+    //uint8_t d;
+    if (x>0x7f || y>0x3f) return;
+
+    for (; c > 0; c--) {
+        if ((y & 0b111) && (y<0x38))
+        {
+        if (x & 0x40) {
+            glcdcont_set(glcd_cs1);
+            glcdcont_unset(glcd_cs2);
+        } else {
+            glcdcont_unset(glcd_cs1);
+            glcdcont_set(glcd_cs2);
+        }
+        glcdcont_unset(glcd_rs);
+        glcddata_write((uint8_t) (glcdc_x | (((y >> 3)&7))+1));
+        glcdcont_set(glcd_e);
+        glcd_wait();
+        glcdcont_unset(glcd_e);
+        glcd_wait();
+        glcddata_write((uint8_t) (glcdc_y | (x & 0x3f)));
+        glcdcont_set(glcd_e);
+        glcd_wait();
+        glcdcont_unset(glcd_e);
+        glcd_wait();
+
+        glcdcont_set(glcd_rs);
+        glcddata_wr_tris(0xff);
+        glcdcont_set(glcd_rw);
+        glcdcont_set(glcd_e);
+        glcd_wait();
+        glcdcont_unset(glcd_e);
+        glcd_wait();
+
+        for(uint8_t d=0;d<=5;d++ )
+        {
+            glcdcont_set(glcd_e);
+            glcd_wait();
+            buf[d]=glcddata_read();
+            glcdcont_unset(glcd_e);
+            glcd_wait();
+            if (x+d==0x3f)
+            {
+                glcdcont_unset(glcd_rw);
+                glcddata_wr_tris(0x00);
+                glcdcont_set(glcd_cs1);
+                glcdcont_unset(glcd_cs2);
+                glcdcont_unset(glcd_rs);
+                glcddata_write((uint8_t)(glcdc_x|(((y>>3)&7)+1)));
+                glcdcont_set(glcd_e);
+                glcd_wait();
+                glcdcont_unset(glcd_e);
+                glcd_wait();
+                glcddata_write((uint8_t)(glcdc_y|0x00));
+                glcdcont_set(glcd_e);
+                glcd_wait();
+                glcdcont_unset(glcd_e);
+                glcd_wait();
+                
+                glcdcont_set(glcd_rs);   
+                glcddata_wr_tris(0xff);
+                glcdcont_set(glcd_rw);
+                glcdcont_set(glcd_e);
+                glcd_wait();
+                glcdcont_unset(glcd_e);
+                glcd_wait();
+
+            }
+            if (x+d==0xff) break;
+        }
+        glcdcont_unset(glcd_rw);
+        glcddata_wr_tris(0x00);
+
+        if (x & 0x40) {
+            glcdcont_set(glcd_cs1);
+            glcdcont_unset(glcd_cs2);
+        } else {
+            glcdcont_unset(glcd_cs1);
+            glcdcont_set(glcd_cs2);
+        }
+        glcdcont_unset(glcd_rs);
+        glcddata_write((uint8_t) (glcdc_x | (((y >> 3)&7)+1)));
+        glcdcont_set(glcd_e);
+        glcd_wait();
+        glcdcont_unset(glcd_e);
+        glcd_wait();
+        glcddata_write((uint8_t) (glcdc_y | (x & 0x3f)));
+        glcdcont_set(glcd_e);
+        glcd_wait();
+        glcdcont_unset(glcd_e);
+        glcd_wait();
+
+        glcdcont_set(glcd_rs);
+
+        for(uint8_t d=0;d<=5;d++ )
+        {
+            uint8_t yy=8-(y&0b111);
+            uint8_t bb=buf[d];
+            bb &=~(0xff>>yy);
+            bb |=system6x8[(unsigned short) (*tx-32)*6+d]>>yy;
+            
+            glcddata_write(bb);
+            glcdcont_set(glcd_e);
+            glcd_wait();
+            glcdcont_unset(glcd_e);
+            glcd_wait();
+            if (x+d==0x3f)
+            {
+                glcdcont_set(glcd_cs1);
+                glcdcont_unset(glcd_cs2);
+                glcdcont_unset(glcd_rs);
+                glcddata_write((uint8_t)(glcdc_x|(((y>>3)&7)+1)));
+                glcdcont_set(glcd_e);
+                glcd_wait();
+                glcdcont_unset(glcd_e);
+                glcd_wait();
+                glcddata_write((uint8_t)(glcdc_y|0x00));
+                glcdcont_set(glcd_e);
+                glcd_wait();
+                glcdcont_unset(glcd_e);
+                glcd_wait();
+                
+                glcdcont_set(glcd_rs);                               
+            }
+            if (x+d==0xff) break;
+        }
+  
+        }
+        
+        
+        
+        if (x & 0x40) {
+            glcdcont_set(glcd_cs1);
+            glcdcont_unset(glcd_cs2);
+        } else {
+            glcdcont_unset(glcd_cs1);
+            glcdcont_set(glcd_cs2);
+        }
+        glcdcont_unset(glcd_rs);
+        glcddata_write((uint8_t) (glcdc_x | ((y >> 3)&7)));
+        glcdcont_set(glcd_e);
+        glcd_wait();
+        glcdcont_unset(glcd_e);
+        glcd_wait();
+        glcddata_write((uint8_t) (glcdc_y | (x & 0x3f)));
+        glcdcont_set(glcd_e);
+        glcd_wait();
+        glcdcont_unset(glcd_e);
+        glcd_wait();
+
+        glcdcont_set(glcd_rs);
+        glcddata_wr_tris(0xff);
+        glcdcont_set(glcd_rw);
+        glcdcont_set(glcd_e);
+        glcd_wait();
+        glcdcont_unset(glcd_e);
+        glcd_wait();
+
+        for(uint8_t d=0;d<=5;d++ )
+        {
+            glcdcont_set(glcd_e);
+            glcd_wait();
+            buf[d]=glcddata_read();
+            glcdcont_unset(glcd_e);
+            glcd_wait();
+            if (x+d==0x40)
+            {
+                glcdcont_unset(glcd_rw);
+                glcddata_wr_tris(0x00);
+                glcdcont_set(glcd_cs1);
+                glcdcont_unset(glcd_cs2);
+                glcdcont_unset(glcd_rs);
+                glcddata_write((uint8_t)(glcdc_x|((y>>3)&7)));
+                glcdcont_set(glcd_e);
+                glcd_wait();
+                glcdcont_unset(glcd_e);
+                glcd_wait();
+                glcddata_write((uint8_t)(glcdc_y|0x00));
+                glcdcont_set(glcd_e);
+                glcd_wait();
+                glcdcont_unset(glcd_e);
+                glcd_wait();
+                
+                glcdcont_set(glcd_rs);   
+                glcddata_wr_tris(0xff);
+                glcdcont_set(glcd_rw);
+                glcdcont_set(glcd_e);
+                glcd_wait();
+                glcdcont_unset(glcd_e);
+                glcd_wait();
+
+            }
+            if (x+d==0x80) break;
+        }
+        glcdcont_unset(glcd_rw);
+        glcddata_wr_tris(0x00);
+
+        if (x & 0x40) {
+            glcdcont_set(glcd_cs1);
+            glcdcont_unset(glcd_cs2);
+        } else {
+            glcdcont_unset(glcd_cs1);
+            glcdcont_set(glcd_cs2);
+        }
+        glcdcont_unset(glcd_rs);
+        glcddata_write((uint8_t) (glcdc_x | ((y >> 3)&7)));
+        glcdcont_set(glcd_e);
+        glcd_wait();
+        glcdcont_unset(glcd_e);
+        glcd_wait();
+        glcddata_write((uint8_t) (glcdc_y | (x & 0x3f)));
+        glcdcont_set(glcd_e);
+        glcd_wait();
+        glcdcont_unset(glcd_e);
+        glcd_wait();
+
+        glcdcont_set(glcd_rs);
+
+        for(uint8_t d=0;d<=5;d++ )
+        {
+            uint8_t yy=y&0b111;
+            uint8_t bb=buf[d];
+            bb &=~(0xff<<yy);
+            bb |=system6x8[(unsigned short) (*tx-32)*6+d]<<yy;
+            
+            glcddata_write(bb);
+            glcdcont_set(glcd_e);
+            glcd_wait();
+            glcdcont_unset(glcd_e);
+            glcd_wait();
+            x++;
+            if (x==0x40)
+            {
+                glcdcont_set(glcd_cs1);
+                glcdcont_unset(glcd_cs2);
+                glcdcont_unset(glcd_rs);
+                glcddata_write((uint8_t)(glcdc_x|((y>>3)&7)));
+                glcdcont_set(glcd_e);
+                glcd_wait();
+                glcdcont_unset(glcd_e);
+                glcd_wait();
+                glcddata_write((uint8_t)(glcdc_y|0x00));
+                glcdcont_set(glcd_e);
+                glcd_wait();
+                glcdcont_unset(glcd_e);
+                glcd_wait();
+                
+                glcdcont_set(glcd_rs);                               
+            }
+            if (x==0x80) break;
+        }
+        if (x==0x80) break;
+        tx++;
+    }
+    glcdcont_unset(glcd_rs);
+
+}
 
 void glcd_set_start_line(uint8_t l)
 {

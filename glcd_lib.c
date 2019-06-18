@@ -373,7 +373,7 @@ void glcd_circle(uint8_t x,uint8_t y,uint8_t r,uint8_t c)
     uint8_t x1;
     uint8_t y1;
     uint8_t y2;
-    d=0;
+    d=-r/2;
     x1=0;
     y2=r+1;
     while (x1<r){
@@ -414,7 +414,7 @@ void glcd_fill_circle(uint8_t x,uint8_t y,uint8_t r,uint8_t c)
     int8_t d;
     uint8_t x1;
     uint8_t y1;
-    d=0;
+    d=-r/2;
     x1=0;
     y1=r;
     while (x1<=r){
@@ -436,8 +436,8 @@ void glcd_fill_donut(uint8_t x,uint8_t y,uint8_t r1,uint8_t r2,uint8_t c)
     uint8_t xx;
     uint8_t y1;
     uint8_t y2;
-    d1=0;
-    d2=0;
+    d1=-r1/2;
+    d2=-r2/2;
     xx=0;
     y1=r1;
     y2=r2+1; //fudge y2 so the circle-in-circle is 1 bigger

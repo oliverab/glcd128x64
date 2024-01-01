@@ -285,13 +285,13 @@ void glcd_line(uint8_t x1,uint8_t y1, uint8_t x2,uint8_t y2,uint8_t c)
  *
  */
 {
-    int8_t dx=x2-x1;
+    int8_t dx=(int8_t)(x2-x1);
     if (dx<0) dx=-dx;
     dx++;
-    int8_t dy=y2-y1;
+    int8_t dy=(int8_t)(y2-y1);
     if (dy<0) dy=-dy;
     dy++;
-    uint8_t d=dx/2;
+    uint8_t d=(uint8_t)(dx/2);
     int d2;
     while (x1!=x2)
     {

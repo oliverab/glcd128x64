@@ -19,7 +19,10 @@
 /*
  * Uncomment if using MCC to insert MCC.h _XTAL_FREQ definition
  */
+//MCC Classic
 //#include "mcc_generated_files/mcc.h"
+//MCC Melody
+//#include "mcc_generated_files/system/system.h"
 /* 
  * glcd control pins
  */

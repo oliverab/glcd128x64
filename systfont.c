@@ -8,8 +8,9 @@
 
 //GLCD FontName : system6x8
 //GLCD FontSize : 6 x 8
+#include <stdint.h>
 
-const unsigned short system6x8[] = {
+const uint8_t system6x8[] = {
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      // Code for char  
         0x00, 0x00, 0x5F, 0x00, 0x00, 0x00,      // Code for char !
         0x00, 0x07, 0x00, 0x07, 0x00, 0x00,      // Code for char "

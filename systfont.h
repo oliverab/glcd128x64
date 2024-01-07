@@ -8,9 +8,9 @@
 #ifndef SYSTFONT_H
 #define	SYSTFONT_H
 
-#include <xc.h> 
+#include <stdint.h>
 
-extern const unsigned short system6x8[];
+extern const uint8_t system6x8[];
 
 #endif	/* SYSTFONT_H */
 

@@ -22,6 +22,9 @@ void glcd_fill_circle(uint8_t x,uint8_t y,uint8_t r,uint8_t c);
 void glcd_fill_donut(uint8_t x,uint8_t y,uint8_t r1,uint8_t r2,uint8_t c);
 void glcd_systext(uint8_t x,uint8_t y,const char *tx,uint8_t c);
 void glcd_adv_systext(uint8_t x,uint8_t y,const char *tx,uint8_t c);
+void glcd_setfont(const uint8_t * address, uint8_t offset, uint8_t prop, uint8_t xs, uint8_t ys);
+uint8_t glcd_lgwide(const char *tx,uint8_t c);
+void glcd_lgtext(uint8_t x,uint8_t y,const char *tx,uint8_t c);
 void glcd_set_start_line(uint8_t l);
 
 #endif	/* GLCD_LIB_H */

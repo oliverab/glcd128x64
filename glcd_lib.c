@@ -785,6 +785,103 @@ void glcd_adv_systext(uint8_t x,uint8_t y,const char *tx,uint8_t c)
     glcdcont_unset(glcd_rs);
 
 }
+struct
+{
+ const uint8_t * address;
+ uint8_t offset,prop,xs,ys,yb,size;
+} font ; 
+void glcd_setfont(const uint8_t * address, uint8_t offset, uint8_t prop, uint8_t xs, uint8_t ys)
+{
+    font.address=address;
+    font.offset=offset;
+    font.prop=prop;
+    font.xs=xs;
+    font.ys=ys;
+    font.yb=(ys+7) / 8;
+    font.size=(font.xs*font.yb)+1;
+}
+uint8_t glcd_lgwide(const char *tx,uint8_t c)
+{
+    uint8_t w=0;
+    if (!font.prop) return c*font.xs;
+    for (;c>0;c--)
+    {
+        w+=font.address[(*tx-font.offset)*font.size];
+        tx++;
+    }
+    return w;
+}
+void glcd_lgtext(uint8_t x,uint8_t y,const char *tx,uint8_t c)
+{
+    uint8_t yb;
+    for (yb=1;yb<=font.yb;yb++)
+    {
+    if (x>0x7f || y>0x3f) return;
+    if (x&0x40) {
+        glcdcont_set(glcd_cs1);
+        glcdcont_unset(glcd_cs2);
+    } else {
+        glcdcont_unset(glcd_cs1);
+        glcdcont_set(glcd_cs2);
+    }
+    glcdcont_unset(glcd_rs);
+    glcddata_write((uint8_t)(glcdc_x|((y>>3)&7)));
+    glcdcont_set(glcd_e);
+    glcd_wait();
+    glcdcont_unset(glcd_e);
+    glcd_wait();
+    glcddata_write((uint8_t)(glcdc_y|(x&0x3f)));
+    glcdcont_set(glcd_e);
+    glcd_wait();
+    glcdcont_unset(glcd_e);
+    glcd_wait();
+
+    glcdcont_set(glcd_rs);
+    uint8_t xx=x;
+    const char* ttx = tx;
+    uint8_t cc;
+    for (cc=c;cc>0;cc--)
+    {
+        const uint8_t* addr=&font.address[(*ttx-font.offset)*font.size];
+        ttx++;
+        uint8_t d;
+        if (font.prop) d=*addr; else d=font.xs;
+        addr+=yb;
+        for(;d>0;d-- )
+        {
+            glcddata_write(*addr);
+            addr+=font.yb;
+            glcdcont_set(glcd_e);
+            glcd_wait();
+            glcdcont_unset(glcd_e);
+            glcd_wait();
+            xx++;
+            if (xx==0x40)
+            {
+                glcdcont_set(glcd_cs1);
+                glcdcont_unset(glcd_cs2);
+                glcdcont_unset(glcd_rs);
+                glcddata_write((uint8_t)(glcdc_x|((y>>3)&7)));
+                glcdcont_set(glcd_e);
+                glcd_wait();
+                glcdcont_unset(glcd_e);
+                glcd_wait();
+                glcddata_write((uint8_t)(glcdc_y|0x00));
+                glcdcont_set(glcd_e);
+                glcd_wait();
+                glcdcont_unset(glcd_e);
+                glcd_wait();
+                
+                glcdcont_set(glcd_rs);                               
+            }
+            if (xx==0x80) break;
+        }
+        if (xx==0x80) break;
+    }
+    glcdcont_unset(glcd_rs);
+    y+=8;
+    }
+}
 
 void glcd_set_start_line(uint8_t l)
 {
